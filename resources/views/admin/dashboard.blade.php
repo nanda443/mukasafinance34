@@ -22,6 +22,7 @@
                 <div class="info-box">
                     <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
                     <div class="info-box-content">
+                        <span class="info-box-text">Total Siswa</span>
                         <span class="info-box-number">{{ $totalSiswa }}</span>
                     </div>
                 </div>
