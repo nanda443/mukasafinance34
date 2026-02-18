@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Dashboard</h1>
+                <h1 class="m-0">Dashboard Administrator</h1>
             </div>
         </div>
     </div>
@@ -22,7 +22,6 @@
                 <div class="info-box">
                     <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Total Siswa</span>
                         <span class="info-box-number">{{ $totalSiswa }}</span>
                     </div>
                 </div>
