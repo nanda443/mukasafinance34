@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - {{ \App\Models\Setting::getValue('system_name', 'SMA Muhammadiyah Kasihan') }}</title>
     @php
-        $favicon = \App\Models\Setting::getValue('favicon');
+        $favicon = \App\Models\Setting::getImageUrl('favicon');
     @endphp
     @if($favicon)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $favicon) }}">
+        <link rel="icon" type="image/png" href="{{ $favicon }}">
     @endif
     
     <!-- Google Font: Poppins -->
@@ -37,8 +37,7 @@
         .login-image {
             width: 60%;
             @php
-                $bgImage = \App\Models\Setting::getValue('login_bg_image');
-                $bgUrl = $bgImage ? asset('storage/' . $bgImage) : 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1986&auto=format&fit=crop';
+                $bgUrl = \App\Models\Setting::getImageUrl('login_bg_image', 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1986&auto=format&fit=crop');
             @endphp
             background-image: url('{{ $bgUrl }}'); /* Modern Architecture/School vibe */
             background-size: cover;
@@ -248,7 +247,7 @@
                     $rest = $parts[1] ?? '';
                 @endphp
                 @if($logo)
-                    <img src="{{ asset('storage/' . $logo) }}" alt="Logo" style="height: 40px;">
+                    <img src="{{ \App\Models\Setting::getImageUrl('system_logo') }}" alt="Logo" style="height: 40px;">
                 @endif
                 <div>
                     <span>{{ $firstWord }}</span> {{ $rest }}

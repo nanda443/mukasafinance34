@@ -19,26 +19,39 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $totalSiswa = User::where('role', 'siswa')->count();
-        
-        $totalPembayaran = Pembayaran::where('pembayarans.status', 'approved')
-            ->join('jenis_pembayarans', 'pembayarans.jenis_pembayaran_id', '=', 'jenis_pembayarans.id')
-            ->sum('jenis_pembayarans.nominal');
+        try {
+            $totalSiswa = User::where('role', 'siswa')->count();
             
-        $pendingPembayaran = Pembayaran::where('pembayarans.status', 'pending')->count();
-        
-        $bulanan = Pembayaran::where('pembayarans.status', 'approved')
-            ->selectRaw('MONTH(pembayarans.created_at) as bulan, SUM(jenis_pembayarans.nominal) as total')
-            ->join('jenis_pembayarans', 'pembayarans.jenis_pembayaran_id', '=', 'jenis_pembayarans.id')
-            ->groupBy('bulan')
-            ->get();
+            // Hitung total pemasukan dari pembayaran yang sudah disetujui
+            $totalPembayaran = Pembayaran::where('status', 'approved')
+                ->selectRaw('SUM(jenis_pembayarans.nominal) as total')
+                ->join('jenis_pembayarans', 'pembayarans.jenis_pembayaran_id', '=', 'jenis_pembayarans.id')
+                ->first()?->total ?? 0;
+                
+            $pendingPembayaran = Pembayaran::where('status', 'pending')->count();
+            
+            // Hitung data per bulan untuk chart
+            $bulanan = Pembayaran::where('status', 'approved')
+                ->selectRaw('MONTH(pembayarans.created_at) as bulan, SUM(jenis_pembayarans.nominal) as total')
+                ->join('jenis_pembayarans', 'pembayarans.jenis_pembayaran_id', '=', 'jenis_pembayarans.id')
+                ->groupBy('bulan')
+                ->get();
 
-        $chartData = array_fill(0, 12, 0);
-        foreach ($bulanan as $bulan) {
-            $chartData[$bulan->bulan - 1] = $bulan->total;
+            $chartData = array_fill(0, 12, 0);
+            foreach ($bulanan as $bulan) {
+                $chartData[$bulan->bulan - 1] = (int)$bulan->total;
+            }
+
+            return view('admin.dashboard', compact('totalSiswa', 'totalPembayaran', 'pendingPembayaran', 'chartData'));
+        } catch (\Exception $e) {
+            Log::error('Dashboard error: ' . $e->getMessage());
+            return view('admin.dashboard', [
+                'totalSiswa' => 0,
+                'totalPembayaran' => 0,
+                'pendingPembayaran' => 0,
+                'chartData' => array_fill(0, 12, 0)
+            ]);
         }
-
-        return view('admin.dashboard', compact('totalSiswa', 'totalPembayaran', 'pendingPembayaran', 'chartData'));
     }
 
     public function dataSiswa(Request $request)

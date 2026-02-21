@@ -4,6 +4,7 @@
 @section('title', 'Detail Jenis Pembayaran')
 
 @section('content')
+<div class="show-jenis-pembayaran-page">
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -267,6 +268,7 @@
         </div>
     </div>
 </section>
+</div>
 @endsection
 
 @push('styles')
@@ -287,6 +289,52 @@
     .table th {
         background-color: #f8f9fa;
         font-weight: 600;
+    }
+
+    .show-jenis-pembayaran-page .table td,
+    .show-jenis-pembayaran-page .table th {
+        vertical-align: middle;
+    }
+
+    @media (max-width: 767.98px) {
+        .show-jenis-pembayaran-page .content-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .show-jenis-pembayaran-page .breadcrumb {
+            float: none !important;
+            margin-top: .45rem;
+            font-size: .82rem;
+        }
+
+        .show-jenis-pembayaran-page .card-body {
+            padding: .85rem;
+        }
+
+        .show-jenis-pembayaran-page .table-responsive {
+            font-size: .86rem;
+        }
+
+        .show-jenis-pembayaran-page .table td,
+        .show-jenis-pembayaran-page .table th {
+            white-space: nowrap;
+        }
+
+        .show-jenis-pembayaran-page .info-box {
+            margin-bottom: .75rem;
+            min-height: 68px;
+            padding: .65rem;
+        }
+
+        .show-jenis-pembayaran-page .info-box-number {
+            font-size: 1rem;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .show-jenis-pembayaran-page .btn.btn-secondary {
+            width: 100%;
+        }
     }
 </style>
 @endpush

@@ -4,6 +4,53 @@
 @section('title', 'Data Siswa')
 
 @section('content')
+<style>
+    @media (max-width: 767.98px) {
+        .data-siswa-page .content-header .float-right {
+            float: none !important;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            margin-top: .75rem;
+        }
+
+        .data-siswa-page .content-header .float-right .btn {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+
+        .data-siswa-page .card-body {
+            padding: .85rem;
+        }
+
+        .data-siswa-page .table-responsive {
+            font-size: .85rem;
+        }
+
+        .data-siswa-page #siswaTable th,
+        .data-siswa-page #siswaTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .data-siswa-page .form-group label {
+            margin-bottom: .35rem;
+        }
+
+        .data-siswa-page .modal-footer {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: .5rem;
+        }
+
+        .data-siswa-page .modal-footer .btn {
+            width: 100%;
+            margin: 0 !important;
+        }
+    }
+</style>
+
+<div class="data-siswa-page">
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -319,6 +366,7 @@
             </form>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

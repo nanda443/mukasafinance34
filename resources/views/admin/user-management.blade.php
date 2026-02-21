@@ -4,6 +4,7 @@
 @section('title', 'Manajemen User')
 
 @section('content')
+<div class="user-management-page">
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -305,10 +306,16 @@
         </div>
     </div>
 </div>
+</div>
 @endsection
 
 @section('styles')
 <style>
+    .user-management-page .table td,
+    .user-management-page .table th {
+        vertical-align: middle;
+    }
+
     .table-responsive {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -371,6 +378,35 @@
     }
     
     @media (max-width: 768px) {
+        .user-management-page .content-header h1 {
+            font-size: 1.2rem;
+        }
+
+        .user-management-page .content-header .btn.float-right {
+            float: none !important;
+            width: 100%;
+            margin-top: .65rem;
+        }
+
+        .user-management-page .card-body {
+            padding: .85rem;
+        }
+
+        .user-management-page .input-group,
+        .user-management-page .row.mb-3 .col-md-6 {
+            margin-bottom: .5rem;
+        }
+
+        .user-management-page #activeFilters .d-flex {
+            align-items: flex-start !important;
+            flex-direction: column;
+            gap: .4rem;
+        }
+
+        .user-management-page #clearAllFilters {
+            margin-left: 0 !important;
+        }
+
         #userTable th:nth-child(1) { width: 8%; }
         #userTable th:nth-child(2) { width: 22%; }
         #userTable th:nth-child(3) { width: 20%; }
@@ -390,6 +426,17 @@
         .btn-group-sm > .btn {
             padding: 0.25rem 0.4rem;
             font-size: 0.7rem;
+        }
+
+        .user-management-page .modal-footer {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: .5rem;
+        }
+
+        .user-management-page .modal-footer .btn {
+            width: 100%;
+            margin: 0 !important;
         }
     }
 </style>
