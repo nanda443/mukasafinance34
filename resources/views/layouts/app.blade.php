@@ -797,7 +797,6 @@
                     pointer-events: auto !important;
                 }
             }
-        }
     </style>
 
     @yield('styles')
