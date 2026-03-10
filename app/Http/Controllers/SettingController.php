@@ -16,7 +16,16 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
-        // 1. Update Text Settings
+        // 1. Validasi input
+        $validated = $request->validate([
+            'system_name' => 'nullable|string|max:255',
+            'system_title' => 'nullable|string|max:255',
+            'favicon' => 'nullable|image|mimes:ico,png,gif,jpg,jpeg|max:512',
+            'system_logo' => 'nullable|image|mimes:jpeg,png,gif,jpg|max:2048',
+            'login_bg_image' => 'nullable|image|mimes:jpeg,png,gif,jpg|max:5120'
+        ]);
+
+        // 2. Update Text Settings
         $inputs = $request->except(['_token', '_method', 'favicon', 'system_logo', 'login_bg_image']);
         
         foreach ($inputs as $key => $value) {
@@ -26,47 +35,52 @@ class SettingController extends Controller
             );
         }
 
-        // 2. Update File Settings
+        // 3. Update File Settings
         $files = ['favicon', 'system_logo', 'login_bg_image'];
 
         foreach ($files as $key) {
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
-                \Illuminate\Support\Facades\Log::info("Processing file: $key");
                 
-                // Validate file
-                if ($file->isValid()) {
+                if ($file && $file->isValid()) {
                     try {
                         $oldSetting = Setting::where('key', $key)->first();
                         
-                        // Delete old file using public disk
+                        // Delete old file
                         if ($oldSetting && !empty($oldSetting->value)) {
                             $oldPath = $oldSetting->value;
                             if (is_string($oldPath) && trim($oldPath) !== '') {
-                                if (Storage::disk('public')->exists($oldPath)) {
-                                    Storage::disk('public')->delete($oldPath);
-                                    \Illuminate\Support\Facades\Log::info("Deleted old file: $oldPath");
+                                try {
+                                    $physicalPath = public_path('uploads/' . $oldPath);
+                                    if (file_exists($physicalPath)) {
+                                        unlink($physicalPath);
+                                    }
+                                } catch (\Exception $e) {
+                                    \Illuminate\Support\Facades\Log::warning("Could not delete old file: " . $e->getMessage());
                                 }
                             }
                         }
 
-                        // Store new file to public disk using putFile
-                        $path = Storage::disk('public')->putFile('settings', $file);
-                        
-                        if ($path) {
-                            \Illuminate\Support\Facades\Log::info("File saved to: $path");
-                            Setting::updateOrCreate(
-                                ['key' => $key],
-                                ['value' => $path, 'type' => 'image']
-                            );
-                        } else {
-                            \Illuminate\Support\Facades\Log::error("Failed to save file: $key");
+                        // Ensure directory exists
+                        $uploadDir = public_path('uploads/settings');
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
                         }
+
+                        // Store new file directly to public folder
+                        $filename = $key . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                        $file->move($uploadDir, $filename);
+                        
+                        $relativePath = 'settings/' . $filename;
+                        
+                        Setting::updateOrCreate(
+                            ['key' => $key],
+                            ['value' => $relativePath, 'type' => 'image']
+                        );
+                        
                     } catch (\Throwable $e) {
-                         \Illuminate\Support\Facades\Log::error("Error saving setting file $key: " . $e->getMessage());
+                        return redirect()->back()->withErrors(['file_error' => "Gagal menyimpan file $key: " . $e->getMessage()])->withInput();
                     }
-                } else {
-                    \Illuminate\Support\Facades\Log::warning("File $key is invalid.");
                 }
             }
         }
@@ -84,4 +98,5 @@ class SettingController extends Controller
         }
     }
 }
+
 

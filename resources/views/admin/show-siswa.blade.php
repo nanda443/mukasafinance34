@@ -3,6 +3,7 @@
 @section('title', 'Detail Siswa - ' . $siswa->name)
 
 @section('content')
+<div class="show-siswa-page">
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -413,6 +414,7 @@
         </div>
     </div>
 </div>
+</div>
 @endsection
 
 @section('styles')
@@ -431,8 +433,44 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
+
+    .show-siswa-page .table td,
+    .show-siswa-page .table th {
+        vertical-align: middle;
+    }
     
     @media (max-width: 768px) {
+        .show-siswa-page .content-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .show-siswa-page .breadcrumb {
+            float: none !important;
+            margin-top: .45rem;
+            font-size: .82rem;
+        }
+
+        .show-siswa-page .card-body {
+            padding: .85rem;
+        }
+
+        .show-siswa-page .card-title {
+            font-size: 1rem;
+        }
+
+        .show-siswa-page .btn-group {
+            width: 100%;
+            display: flex;
+        }
+
+        .show-siswa-page .btn-group .btn {
+            flex: 1;
+        }
+
+        .show-siswa-page .btn-hapus-tagihan {
+            width: 100%;
+        }
+
         .border-right {
             border-right: none;
             border-bottom: 1px solid #dee2e6;
@@ -446,6 +484,17 @@
         
         .table-responsive {
             font-size: 0.875rem;
+        }
+
+        .show-siswa-page .modal-footer {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: .5rem;
+        }
+
+        .show-siswa-page .modal-footer .btn {
+            width: 100%;
+            margin: 0 !important;
         }
     }
 </style>

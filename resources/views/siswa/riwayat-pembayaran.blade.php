@@ -21,7 +21,7 @@
 
 <section class="content">
     <div class="container-fluid">
-        <div class="card card-primary card-outline">
+        <div class="card card-primary card-outline student-mobile-card">
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-history mr-1"></i>
@@ -29,7 +29,7 @@
                 </h3>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
+                <div class="table-responsive d-none d-md-block">
                     <table class="table table-bordered table-striped table-hover" id="table-riwayat">
                         <thead>
                             <tr>
@@ -60,6 +60,24 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <div class="student-mobile-list d-md-none student-mobile-only">
+                    @forelse($pembayarans as $pembayaran)
+                    <a href="{{ route('siswa.riwayat.show', $pembayaran->id) }}" class="student-mobile-item text-decoration-none">
+                        <span class="student-mobile-icon"><i class="fas fa-history"></i></span>
+                        <div class="student-mobile-main">
+                            <strong>{{ $pembayaran->jenisPembayaran->nama }}</strong>
+                            <span>{{ $pembayaran->created_at->format('d M Y H:i') }}</span>
+                        </div>
+                        <div class="student-mobile-side">
+                            Rp {{ number_format($pembayaran->jenisPembayaran->nominal, 0, ',', '.') }}
+                            <div>{!! $pembayaran->status_badge !!}</div>
+                        </div>
+                    </a>
+                    @empty
+                    <div class="p-3 text-center text-muted small">Belum ada riwayat pembayaran.</div>
+                    @endforelse
                 </div>
             </div>
         </div>

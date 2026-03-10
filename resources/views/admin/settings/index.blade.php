@@ -3,13 +3,98 @@
 @section('title', 'Admin - Pengaturan Sistem')
 
 @section('content')
-<div class="row">
+<style>
+    .settings-page .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .settings-page .setting-preview {
+        background-color: #f8f9fa;
+    }
+
+    .settings-page .setting-preview code {
+        word-break: break-all;
+        white-space: normal;
+    }
+
+    @media (max-width: 767.98px) {
+        .settings-page .card-header .nav {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .settings-page .card-header .nav .nav-item {
+            flex: 0 0 auto;
+        }
+
+        .settings-page .card-header .nav-link {
+            padding: .65rem .9rem;
+            font-size: .9rem;
+        }
+
+        .settings-page .card-body {
+            padding: .9rem;
+        }
+
+        .settings-page .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .settings-page .setting-preview .row {
+            margin: 0;
+        }
+
+        .settings-page .setting-preview .col-auto,
+        .settings-page .setting-preview .col {
+            padding-left: 0;
+            padding-right: 0;
+            max-width: 100%;
+            flex: 0 0 100%;
+        }
+
+        .settings-page .setting-preview .col-auto {
+            margin-bottom: .5rem;
+        }
+
+        .settings-page .card-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .settings-page .card-footer .btn {
+            width: 100%;
+        }
+
+        .settings-page .card-footer .float-right {
+            float: none !important;
+        }
+    }
+</style>
+
+<div class="row settings-page">
     <div class="col-12">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                 <h5><i class="icon fas fa-check"></i> Berhasil!</h5>
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-exclamation"></i> Error!</h5>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
@@ -99,10 +184,21 @@
                                     </div>
                                 </div>
                                 <small class="text-muted">Format yang disarankan: .ico atau .png (32x32 px)</small>
-                                @if(isset($settings['favicon']) && $settings['favicon']->value)
-                                    <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $settings['favicon']->value) }}" alt="Favicon" style="height: 32px; width: 32px; object-fit: contain; border: 1px solid #ddd; padding: 2px;">
-                                        <span class="ml-2 text-muted">Saat ini</span>
+                                @if(isset($settings['favicon']) && $settings['favicon']->value && !empty($settings['favicon']->value))
+                                    <div class="mt-3 p-2 border rounded setting-preview">
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <img src="{{ \App\Models\Setting::getImageUrl('favicon') }}" alt="Favicon" style="height: 32px; width: 32px; object-fit: contain; border: 1px solid #ddd; padding: 2px;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text>Error</text></svg>'">
+                                            </div>
+                                            <div class="col">
+                                                <small class="d-block text-muted">File saat ini: <code>{{ $settings['favicon']->value }}</code></small>
+                                                <small class="d-block text-primary">Upload file baru untuk mengganti</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mt-2 alert alert-info">
+                                        <small><i class="fas fa-info-circle"></i> Belum ada file yang di-upload</small>
                                     </div>
                                 @endif
                             </div>
@@ -115,10 +211,21 @@
                                         <label class="custom-file-label" for="system_logo">Pilih file</label>
                                     </div>
                                 </div>
-                                @if(isset($settings['system_logo']) && $settings['system_logo']->value)
-                                    <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $settings['system_logo']->value) }}" alt="Logo" style="height: 50px; object-fit: contain; border: 1px solid #ddd; padding: 5px; background: #eee;">
-                                        <span class="ml-2 text-muted">Saat ini</span>
+                                @if(isset($settings['system_logo']) && $settings['system_logo']->value && !empty($settings['system_logo']->value))
+                                    <div class="mt-3 p-2 border rounded setting-preview">
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <img src="{{ \App\Models\Setting::getImageUrl('system_logo') }}" alt="Logo" style="height: 50px; object-fit: contain; border: 1px solid #ddd; padding: 5px; background: #eee;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text>Error</text></svg>'">
+                                            </div>
+                                            <div class="col">
+                                                <small class="d-block text-muted">File saat ini: <code>{{ $settings['system_logo']->value }}</code></small>
+                                                <small class="d-block text-primary">Upload file baru untuk mengganti</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mt-2 alert alert-info">
+                                        <small><i class="fas fa-info-circle"></i> Belum ada file yang di-upload</small>
                                     </div>
                                 @endif
                             </div>
@@ -132,10 +239,21 @@
                                     </div>
                                 </div>
                                 <small class="text-muted">Gambar besar untuk sisi kiri halaman login (Disarankan 1920x1080 px)</small>
-                                @if(isset($settings['login_bg_image']) && $settings['login_bg_image']->value)
-                                    <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $settings['login_bg_image']->value) }}" alt="Background" style="height: 100px; width: 200px; object-fit: cover; border: 1px solid #ddd;">
-                                        <span class="ml-2 text-muted">Saat ini</span>
+                                @if(isset($settings['login_bg_image']) && $settings['login_bg_image']->value && !empty($settings['login_bg_image']->value))
+                                    <div class="mt-3 p-2 border rounded setting-preview">
+                                        <div class="row">
+                                            <div class="col-auto">
+                                                <img src="{{ \App\Models\Setting::getImageUrl('login_bg_image') }}" alt="Background" style="height: 100px; width: 200px; object-fit: cover; border: 1px solid #ddd;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text>Error</text></svg>'">
+                                            </div>
+                                            <div class="col">
+                                                <small class="d-block text-muted">File saat ini: <code>{{ $settings['login_bg_image']->value }}</code></small>
+                                                <small class="d-block text-primary">Upload file baru untuk mengganti</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mt-2 alert alert-info">
+                                        <small><i class="fas fa-info-circle"></i> Belum ada file yang di-upload</small>
                                     </div>
                                 @endif
                             </div>

@@ -84,6 +84,7 @@ function showErrorAlert(message) {
 }
 </script>
 
+<div class="jenis-pembayaran-page">
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -337,10 +338,16 @@ function showErrorAlert(message) {
     </div>
 </div>
 
+    </div>
 @endsection
 
 @push('styles')
 <style>
+    .jenis-pembayaran-page .table td,
+    .jenis-pembayaran-page .table th {
+        vertical-align: middle;
+    }
+
     .table th {
         background-color: #f8f9fa;
         font-weight: 600;
@@ -350,6 +357,47 @@ function showErrorAlert(message) {
     }
     .badge {
         font-size: 0.8em;
+    }
+
+    @media (max-width: 767.98px) {
+        .jenis-pembayaran-page .content-header h1 {
+            font-size: 1.3rem;
+        }
+
+        .jenis-pembayaran-page .content-header .btn.float-right {
+            float: none !important;
+            width: 100%;
+            margin-top: .65rem;
+        }
+
+        .jenis-pembayaran-page .card-body {
+            padding: .85rem;
+        }
+
+        .jenis-pembayaran-page .table-responsive {
+            font-size: .86rem;
+        }
+
+        .jenis-pembayaran-page .table td,
+        .jenis-pembayaran-page .table th {
+            white-space: nowrap;
+        }
+
+        .jenis-pembayaran-page .btn-group {
+            display: inline-flex;
+            flex-wrap: nowrap;
+        }
+
+        .jenis-pembayaran-page .modal-footer {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: .5rem;
+        }
+
+        .jenis-pembayaran-page .modal-footer .btn {
+            width: 100%;
+            margin: 0 !important;
+        }
     }
 </style>
 @endpush

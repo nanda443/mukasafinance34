@@ -21,10 +21,71 @@
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
+        <div class="d-md-none student-mobile-only mb-3">
+            <div class="invoice-mobile-wrap">
+                <div class="invoice-mobile-head">
+                    <div>
+                        <small>Invoice</small>
+                        <h3>INV-{{ str_pad($pembayaran->id, 4, '0', STR_PAD_LEFT) }}-{{ $pembayaran->created_at->format('ym') }}</h3>
+                    </div>
+                    <a href="{{ route('siswa.tagihan.index') }}" class="invoice-mobile-back"><i class="fas fa-arrow-left"></i></a>
+                </div>
+
+                <div class="invoice-mobile-status">
+                    {!! $pembayaran->status_badge !!}
+                    @if($pembayaran->tenggat_waktu)
+                        <small>Due by {{ $pembayaran->tenggat_waktu->format('d M Y') }}</small>
+                    @endif
+                </div>
+
+                <div class="invoice-mobile-title">{{ $pembayaran->jenisPembayaran->nama }}</div>
+                <div class="invoice-mobile-amount">Rp {{ number_format($pembayaran->jenisPembayaran->nominal, 0, ',', '.') }}</div>
+
+                <div class="invoice-mobile-meta">
+                    <div>
+                        <span>Kategori</span>
+                        <strong>{{ $pembayaran->jenisPembayaran->kategori }}</strong>
+                    </div>
+                    <div>
+                        <span>Tanggal Bayar</span>
+                        <strong>{{ $pembayaran->tanggal_bayar ? $pembayaran->tanggal_bayar->format('d/m/Y') : '-' }}</strong>
+                    </div>
+                    <div>
+                        <span>Upload</span>
+                        <strong>{{ $pembayaran->created_at->format('d/m/Y H:i') }}</strong>
+                    </div>
+                </div>
+
+                <div class="invoice-mobile-note">
+                    @if($pembayaran->status == 'pending')
+                        Pembayaran Anda sedang menunggu persetujuan bendahara.
+                    @elseif($pembayaran->status == 'rejected')
+                        Pembayaran ditolak. {{ $pembayaran->alasan_reject ? 'Alasan: ' . $pembayaran->alasan_reject : '' }}
+                    @elseif($pembayaran->status == 'approved')
+                        Pembayaran sudah diverifikasi dan diterima.
+                    @endif
+                </div>
+
+                <div class="invoice-mobile-actions">
+                    @if($pembayaran->bukti)
+                        <a href="{{ asset('storage/' . $pembayaran->bukti) }}" target="_blank" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-file-alt mr-1"></i> Lihat Bukti Pembayaran
+                        </a>
+                    @endif
+
+                    @if($pembayaran->status == 'rejected')
+                        <a href="{{ route('siswa.tagihan.index') }}" class="btn btn-primary btn-block">
+                            <i class="fas fa-credit-card mr-1"></i> Bayar Ulang
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="row d-none d-md-flex">
             <div class="col-md-6">
                 <!-- Informasi Tagihan -->
-                <div class="card card-primary">
+                <div class="card card-primary student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Informasi Tagihan</h3>
                     </div>
@@ -75,7 +136,7 @@
                 </div>
 
                 <!-- Status Pembayaran -->
-                <div class="card card-{{ $pembayaran->status == 'approved' ? 'success' : ($pembayaran->status == 'rejected' ? 'danger' : 'warning') }}">
+                <div class="card card-{{ $pembayaran->status == 'approved' ? 'success' : ($pembayaran->status == 'rejected' ? 'danger' : 'warning') }} student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Status Pembayaran</h3>
                     </div>
@@ -110,7 +171,7 @@
 
             <div class="col-md-6">
                 <!-- Informasi Upload -->
-                <div class="card card-info">
+                <div class="card card-info student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Informasi Upload</h3>
                     </div>
@@ -137,7 +198,7 @@
                 </div>
 
                 <!-- Bukti Pembayaran -->
-                <div class="card card-success">
+                <div class="card card-success student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Bukti Pembayaran</h3>
                     </div>
@@ -182,7 +243,7 @@
                 </div>
 
                 <!-- Timeline Status -->
-                <div class="card">
+                <div class="card student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Timeline Status</h3>
                     </div>
@@ -296,6 +357,147 @@
     text-align: center;
     left: 18px;
     top: 0;
+}
+
+@media (max-width: 767.98px) {
+    body.role-siswa .invoice-mobile-wrap {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid rgba(14, 116, 144, .18);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
+        overflow: hidden;
+    }
+
+    body.role-siswa .invoice-mobile-head {
+        background: linear-gradient(145deg, #0a5b7a 0%, #1f7da0 54%, #2f8eb2 100%);
+        color: #fff;
+        padding: .85rem .9rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    body.role-siswa .invoice-mobile-head small {
+        display: block;
+        opacity: .85;
+        font-size: .7rem;
+        margin-bottom: .1rem;
+    }
+
+    body.role-siswa .invoice-mobile-head h3 {
+        margin: 0;
+        font-size: .92rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+    }
+
+    body.role-siswa .invoice-mobile-back {
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, .2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    body.role-siswa .invoice-mobile-status,
+    body.role-siswa .invoice-mobile-title,
+    body.role-siswa .invoice-mobile-amount,
+    body.role-siswa .invoice-mobile-meta,
+    body.role-siswa .invoice-mobile-note,
+    body.role-siswa .invoice-mobile-actions {
+        padding-left: .9rem;
+        padding-right: .9rem;
+    }
+
+    body.role-siswa .invoice-mobile-status {
+        padding-top: .7rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    body.role-siswa .invoice-mobile-status small {
+        color: #0369a1;
+        font-size: .69rem;
+    }
+
+    body.role-siswa .invoice-mobile-status .badge {
+        background: #0284c7;
+        color: #fff;
+    }
+
+    body.role-siswa .invoice-mobile-title {
+        color: #0f172a;
+        margin-top: .3rem;
+        font-weight: 700;
+        font-size: 1.02rem;
+    }
+
+    body.role-siswa .invoice-mobile-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.1;
+        color: #0369a1;
+        margin: .25rem 0 .55rem;
+    }
+
+    body.role-siswa .invoice-mobile-meta {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .45rem;
+        padding-bottom: .7rem;
+        border-bottom: 1px dashed rgba(14, 116, 144, .35);
+    }
+
+    body.role-siswa .invoice-mobile-meta span {
+        display: block;
+        font-size: .68rem;
+        color: #64748b;
+        margin-bottom: .05rem;
+    }
+
+    body.role-siswa .invoice-mobile-meta strong {
+        font-size: .8rem;
+        color: #0f172a;
+    }
+
+    body.role-siswa .invoice-mobile-note {
+        padding-top: .65rem;
+        font-size: .76rem;
+        color: #0f4c64;
+        background: #f0f9ff;
+        border: 1px solid rgba(14, 116, 144, .2);
+        border-radius: 10px;
+        margin: .45rem .9rem 0;
+        padding: .55rem .6rem;
+    }
+
+    body.role-siswa .invoice-mobile-actions {
+        padding-top: .6rem;
+        padding-bottom: .85rem;
+    }
+
+    body.role-siswa .invoice-mobile-actions .btn {
+        border-radius: 10px;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    body.role-siswa .invoice-mobile-actions .btn-outline-primary {
+        color: #0369a1;
+        border-color: rgba(14, 116, 144, .35);
+        background: #f0f9ff;
+    }
+
+    body.role-siswa .invoice-mobile-actions .btn-primary {
+        background: linear-gradient(145deg, #0a5b7a 0%, #1f7da0 54%, #2f8eb2 100%);
+        border-color: #0a5b7a;
+    }
 }
 </style>
 @endsection

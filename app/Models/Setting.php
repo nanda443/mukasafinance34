@@ -28,4 +28,25 @@ class Setting extends Model
 
         return $setting->value;
     }
+
+    public static function getImageUrl($key, $default = null)
+    {
+        $value = self::getValue($key, null);
+
+        if (!$value) {
+            return $default;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+
+        $cleanPath = ltrim($value, '/');
+
+        if (str_starts_with($cleanPath, 'uploads/') || str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
+        }
+
+        return asset('uploads/' . $cleanPath);
+    }
 }

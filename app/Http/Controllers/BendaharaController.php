@@ -205,7 +205,7 @@ class BendaharaController extends Controller
     public function approvalPembayaran(Request $request)
     {
         if ($request->ajax()) {
-            $data = Pembayaran::with(['user', 'jenisPembayaran'])
+            $queryCommon = Pembayaran::query()
                 ->when($request->kelas, function($query) use ($request) {
                     return $query->whereHas('user', function($q) use ($request) {
                         $q->where('kelas', $request->kelas);
@@ -216,16 +216,50 @@ class BendaharaController extends Controller
                         $q->where('jurusan', $request->jurusan);
                     });
                 })
-                ->when($request->status, function($query) use ($request) {
-                    return $query->where('pembayarans.status', $request->status);
-                })
                 ->when($request->jenis_pembayaran, function($query) use ($request) {
                     return $query->where('jenis_pembayaran_id', $request->jenis_pembayaran);
+                });
+
+            $data = (clone $queryCommon)
+                ->when($request->kategori, function($query) use ($request) {
+                    return $query->whereHas('jenisPembayaran', function($q) use ($request) {
+                        $q->where('kategori', $request->kategori);
+                    });
                 })
+                ->when($request->status, function($query) use ($request) {
+                    return $query->where('pembayarans.status', $request->status);
+                });
+
+            $statusCountQuery = (clone $queryCommon)
+                ->when($request->kategori, function($query) use ($request) {
+                    return $query->whereHas('jenisPembayaran', function($q) use ($request) {
+                        $q->where('kategori', $request->kategori);
+                    });
+                });
+
+            $kategoriCountQuery = (clone $queryCommon)
+                ->when($request->status, function($query) use ($request) {
+                    return $query->where('pembayarans.status', $request->status);
+                });
+
+            $dataTableQuery = (clone $data)
+                ->with(['user', 'jenisPembayaran'])
                 ->select('pembayarans.*')
                 ->orderBy('pembayarans.created_at', 'desc');
 
-            return DataTables::of($data)
+            $totalCount = (clone $statusCountQuery)->count();
+            $pendingCount = (clone $statusCountQuery)->where('status', 'pending')->count();
+            $approvedCount = (clone $statusCountQuery)->where('status', 'approved')->count();
+            $rejectedCount = (clone $statusCountQuery)->where('status', 'rejected')->count();
+
+            $kategoriCounts = (clone $kategoriCountQuery)
+                ->join('jenis_pembayarans', 'pembayarans.jenis_pembayaran_id', '=', 'jenis_pembayarans.id')
+                ->selectRaw('jenis_pembayarans.kategori as kategori, COUNT(*) as total')
+                ->groupBy('jenis_pembayarans.kategori')
+                ->pluck('total', 'kategori')
+                ->toArray();
+
+            return DataTables::of($dataTableQuery)
                 ->addIndexColumn()
                 ->addColumn('nama_siswa', function($row){
                     return $row->user->name ?? '-';
@@ -305,10 +339,12 @@ class BendaharaController extends Controller
                 })
                 ->rawColumns(['status_badge', 'tenggat_badge', 'bukti', 'action'])
                 ->with([
-                    'recordsTotal' => Pembayaran::count(),
+                    'recordsTotal' => $totalCount,
                     'recordsFiltered' => $data->count(),
-                    'approvedCount' => Pembayaran::where('status', 'approved')->count(),
-                    'rejectedCount' => Pembayaran::where('status', 'rejected')->count(),
+                    'pendingCount' => $pendingCount,
+                    'approvedCount' => $approvedCount,
+                    'rejectedCount' => $rejectedCount,
+                    'kategoriCounts' => $kategoriCounts,
                 ])
                 ->make(true);
         }

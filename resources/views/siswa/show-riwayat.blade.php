@@ -23,7 +23,7 @@
         <div class="row">
             <div class="col-md-6">
                 <!-- Informasi Tagihan -->
-                <div class="card card-primary">
+                <div class="card card-primary student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Informasi Pembayaran</h3>
                     </div>
@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Status Pembayaran -->
-                <div class="card card-{{ $pembayaran->status == 'approved' ? 'success' : ($pembayaran->status == 'rejected' ? 'danger' : 'warning') }}">
+                <div class="card card-{{ $pembayaran->status == 'approved' ? 'success' : ($pembayaran->status == 'rejected' ? 'danger' : 'warning') }} student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Status Pembayaran</h3>
                     </div>
@@ -94,7 +94,7 @@
 
             <div class="col-md-6">
                 <!-- Informasi Upload -->
-                <div class="card card-info">
+                <div class="card card-info student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Informasi Upload</h3>
                     </div>
@@ -121,7 +121,7 @@
                 </div>
 
                 <!-- Bukti Pembayaran -->
-                <div class="card card-success">
+                <div class="card card-success student-mobile-card">
                     <div class="card-header">
                         <h3 class="card-title">Bukti Pembayaran</h3>
                     </div>
@@ -168,4 +168,60 @@
         </div>
     </div>
 </section>
+@endsection
+
+@section('styles')
+<style>
+@media (max-width: 767.98px) {
+    body.role-siswa .student-mobile-card {
+        border-color: rgba(14, 116, 144, .18);
+    }
+
+    body.role-siswa .student-mobile-card .card-header {
+        background: linear-gradient(145deg, #0a5b7a 0%, #1f7da0 54%, #2f8eb2 100%);
+        border-bottom: 0;
+    }
+
+    body.role-siswa .student-mobile-card .card-header .card-title,
+    body.role-siswa .student-mobile-card .card-header i {
+        color: #fff;
+    }
+
+    body.role-siswa .student-mobile-card .table th {
+        color: #0f4c64;
+        background: #f0f9ff;
+        border-color: rgba(14, 116, 144, .2);
+        font-size: .72rem;
+    }
+
+    body.role-siswa .student-mobile-card .table td {
+        border-color: rgba(14, 116, 144, .18);
+        font-size: .76rem;
+    }
+
+    body.role-siswa .student-mobile-card .text-success {
+        color: #0369a1 !important;
+    }
+
+    body.role-siswa .student-mobile-card .badge {
+        background: #0284c7;
+        color: #fff;
+    }
+
+    body.role-siswa .student-mobile-card .alert {
+        border: 1px solid rgba(14, 116, 144, .2);
+        background: #f0f9ff;
+        color: #0f4c64;
+    }
+
+    body.role-siswa .student-mobile-card .btn-outline-primary,
+    body.role-siswa .student-mobile-card .btn-info,
+    body.role-siswa .student-mobile-card .btn-danger {
+        color: #0369a1;
+        background: #f0f9ff;
+        border-color: rgba(14, 116, 144, .35);
+        font-weight: 700;
+    }
+}
+</style>
 @endsection

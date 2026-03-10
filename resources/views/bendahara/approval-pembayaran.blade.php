@@ -4,6 +4,68 @@
 @section('title', 'Approval Pembayaran')
 
 @section('content')
+<style>
+    .kategori-tabs-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .kategori-tabs {
+        flex-wrap: nowrap;
+        min-width: max-content;
+    }
+
+    .kategori-tabs .nav-link {
+        white-space: nowrap;
+        font-weight: 500;
+    }
+
+    .kategori-tabs .badge {
+        margin-left: .35rem;
+        font-size: .75rem;
+        vertical-align: middle;
+    }
+
+    .kategori-tabs .nav-link.active {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+    }
+
+    .kategori-tabs .nav-link.active .badge {
+        background-color: #fff !important;
+        color: #343a40 !important;
+    }
+
+    .status-tabs-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .status-tabs {
+        flex-wrap: nowrap;
+        min-width: max-content;
+    }
+
+    .status-tabs .nav-link {
+        white-space: nowrap;
+        font-weight: 500;
+    }
+
+    .status-tabs .badge {
+        margin-left: .35rem;
+        font-size: .75rem;
+        vertical-align: middle;
+    }
+
+    .status-tabs .nav-link.active {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+    }
+
+    .status-tabs .nav-link.active .badge {
+        background-color: #fff !important;
+        color: #343a40 !important;
+    }
+</style>
+
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -148,6 +210,55 @@
                 </div>
             </div>
             <div class="card-body">
+                @php
+                    $kategoriTabs = collect($jenisPembayaran)->pluck('kategori')->filter()->unique()->values();
+                @endphp
+
+                <div class="kategori-tabs-wrapper mb-3">
+                    <ul class="nav nav-pills kategori-tabs" id="kategoriTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-kategori="">
+                                Semua Kategori <span class="badge badge-light" id="tabKategoriAllCount">0</span>
+                            </a>
+                        </li>
+                        @foreach($kategoriTabs as $kategori)
+                            @php $kategoriSlug = \Illuminate\Support\Str::slug($kategori, '-'); @endphp
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-kategori="{{ $kategori }}">
+                                    {{ $kategori }} <span class="badge badge-info kategori-count-badge" id="tabKategoriCount-{{ $kategoriSlug }}">0</span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                <div class="status-tabs-wrapper mb-3">
+                    <ul class="nav nav-pills status-tabs" id="statusTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-status="">
+                                Semua Status <span class="badge badge-light" id="tabStatusAllCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-status="pending">
+                                Menunggu <span class="badge badge-warning" id="tabPendingCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-status="approved">
+                                Disetujui <span class="badge badge-success" id="tabApprovedCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-status="rejected">
+                                Ditolak <span class="badge badge-danger" id="tabRejectedCount">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <input type="hidden" id="filterKategori" value="">
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover w-100" id="approvalTable">
                         <thead class="thead-light">
@@ -284,6 +395,7 @@ $(document).ready(function() {
                 d.jurusan = $('#filterJurusan').val();
                 d.status = $('#filterStatus').val();
                 d.jenis_pembayaran = $('#filterJenisPembayaran').val();
+                d.kategori = $('#filterKategori').val();
             },
             error: function(xhr, error, thrown) {
                 console.log('DataTables error:', xhr, error, thrown);
@@ -372,6 +484,47 @@ $(document).ready(function() {
         }
     });
 
+    function setActiveKategoriTab(kategori) {
+        $('#kategoriTabs .nav-link').removeClass('active');
+        var target = $('#kategoriTabs .nav-link[data-kategori="' + kategori + '"]');
+
+        if (target.length) {
+            target.addClass('active');
+        } else {
+            $('#kategoriTabs .nav-link[data-kategori=""]').addClass('active');
+        }
+    }
+
+    function setActiveStatusTab(status) {
+        $('#statusTabs .nav-link').removeClass('active');
+        var target = $('#statusTabs .nav-link[data-status="' + status + '"]');
+
+        if (target.length) {
+            target.addClass('active');
+        } else {
+            $('#statusTabs .nav-link[data-status=""]').addClass('active');
+        }
+    }
+
+    // Tab kategori untuk monitoring cepat
+    $('#kategoriTabs .nav-link').on('click', function(e) {
+        e.preventDefault();
+        var kategori = $(this).data('kategori');
+        $('#filterKategori').val(kategori);
+        setActiveKategoriTab(kategori);
+        table.ajax.reload();
+        updateStatistics();
+    });
+
+    $('#statusTabs .nav-link').on('click', function(e) {
+        e.preventDefault();
+        var status = $(this).data('status');
+        $('#filterStatus').val(status);
+        setActiveStatusTab(status);
+        table.ajax.reload();
+        updateStatistics();
+    });
+
     // Update statistics
     function updateStatistics() {
         // Get data from server for statistics
@@ -385,13 +538,34 @@ $(document).ready(function() {
                 kelas: $('#filterKelas').val(),
                 jurusan: $('#filterJurusan').val(),
                 status: $('#filterStatus').val(),
-                jenis_pembayaran: $('#filterJenisPembayaran').val()
+                jenis_pembayaran: $('#filterJenisPembayaran').val(),
+                kategori: $('#filterKategori').val()
             },
             success: function(response) {
-                $('#pendingCount').text(response.recordsFiltered || 0);
-                $('#approvedCount').text(response.approvedCount || 0);
-                $('#rejectedCount').text(response.rejectedCount || 0);
-                $('#totalCount').text(response.recordsTotal || 0);
+                const total = Number(response.recordsTotal || 0);
+                const approved = Number(response.approvedCount || 0);
+                const rejected = Number(response.rejectedCount || 0);
+                const pending = Number(response.pendingCount ?? Math.max(total - approved - rejected, 0));
+                const kategoriCounts = response.kategoriCounts || {};
+
+                $('#pendingCount').text(pending);
+                $('#approvedCount').text(approved);
+                $('#rejectedCount').text(rejected);
+                $('#totalCount').text(total);
+
+                $('#tabKategoriAllCount').text(total);
+                $('.kategori-count-badge').text(0);
+                $('#tabStatusAllCount').text(total);
+                $('#tabPendingCount').text(pending);
+                $('#tabApprovedCount').text(approved);
+                $('#tabRejectedCount').text(rejected);
+
+                Object.keys(kategoriCounts).forEach(function(kategoriKey) {
+                    var slug = kategoriKey.toString().toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/(^-|-$)/g, '');
+                    $('#tabKategoriCount-' + slug).text(Number(kategoriCounts[kategoriKey] || 0));
+                });
             }
         });
     }
@@ -407,12 +581,18 @@ $(document).ready(function() {
         $('#filterJurusan').val('');
         $('#filterStatus').val('');
         $('#filterJenisPembayaran').val('');
+        $('#filterKategori').val('');
+        setActiveKategoriTab('');
+        setActiveStatusTab('');
         table.ajax.reload();
         updateStatistics();
     });
 
     // Change events for filters
     $('#filterKelas, #filterJurusan, #filterStatus, #filterJenisPembayaran').change(function() {
+        if ($(this).attr('id') === 'filterStatus') {
+            setActiveStatusTab($('#filterStatus').val());
+        }
         table.ajax.reload();
         updateStatistics();
     });
@@ -565,6 +745,8 @@ $(document).ready(function() {
     });
 
     // Initial statistics load
+    setActiveKategoriTab($('#filterKategori').val() || '');
+    setActiveStatusTab($('#filterStatus').val() || '');
     updateStatistics();
 });
 </script>
